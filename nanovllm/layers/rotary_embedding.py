@@ -1,4 +1,3 @@
-from functools import lru_cache
 import torch
 from torch import nn
 
@@ -48,7 +47,6 @@ class RotaryEmbedding(nn.Module):
         return query, key
 
 
-@lru_cache(1)
 def get_rope(
     head_size: int,
     rotary_dim: int,
@@ -56,6 +54,7 @@ def get_rope(
     base: float,
     rope_scaling: dict | None = None,
 ):
-    assert rope_scaling is None
+    # Some HF configs provide rope_scaling as a dict (e.g. Qwen3).
+    # nano-vllm currently uses a plain RoPE implementation, so we ignore it.
     rotary_emb = RotaryEmbedding(head_size, rotary_dim, max_position, base)
     return rotary_emb
